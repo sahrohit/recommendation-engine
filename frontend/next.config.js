@@ -1,8 +1,13 @@
 /** @type {import('next').NextConfig} */
-const nextConfig = {
-  experimental: {
-    appDir: true,
-  },
-}
 
-module.exports = nextConfig
+const nextConfig = {
+	reactStrictMode: true,
+	images: {
+		domains: [
+			"source.unsplash.com",
+			"lh3.googleusercontent.com",
+			"images.unsplash.com",
+		],
+	},
+};
+module.exports = nextConfig;

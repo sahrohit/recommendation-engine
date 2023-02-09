@@ -62,7 +62,6 @@ const Carousel = ({ slides }) => {
 							boxSize="full"
 							shadow="md"
 							flex="none"
-							rounded={"2xl"}
 						>
 							<Text
 								color="white"

@@ -7,6 +7,7 @@ import theme from "../config/theme";
 import * as gtag from "../lib/gtag";
 import "../styles/globals.css";
 
+import Layout from "@components/pages/home/Layout";
 import Router from "next/router";
 import NProgress from "nprogress";
 import "nprogress/nprogress.css";
@@ -41,8 +42,9 @@ function MyApp({ Component, pageProps }) {
 							`,
 							}}
 						/>
-						{/* <TopAlert /> */}
-						<Component {...pageProps} />
+						<Layout>
+							<Component {...pageProps} />
+						</Layout>
 					</UserProvider>
 				</AuthProvider>
 			</ChakraProvider>

@@ -20,6 +20,7 @@
     "firebase": "^9.16.0",
     "formik": "^2.2.9",
     "framer-motion": "^9.0.1",
+    "lodash.debounce": "^4.0.8",
     "next": "13.1.6",
     "next-pwa": "^5.6.0",
     "nprogress": "^0.2.0",

@@ -1,39 +1,41 @@
 import {
-    Avatar,
-    Box,
-    Button,
-    CloseButton,
-    Drawer,
-    DrawerContent,
-    Flex,
-    HStack,
-    Icon,
-    IconButton,
-    Link,
-    Menu,
-    MenuButton,
-    MenuDivider,
-    MenuItem,
-    MenuList,
-    Text,
-    VStack,
-    useColorModeValue,
-    useDisclosure,
+	Avatar,
+	Box,
+	Button,
+	CloseButton,
+	Drawer,
+	DrawerContent,
+	Flex,
+	HStack,
+	Icon,
+	IconButton,
+	Link,
+	Menu,
+	MenuButton,
+	MenuDivider,
+	MenuItem,
+	MenuList,
+	Text,
+	VStack,
+	useColorModeValue,
+	useDisclosure,
 } from "@chakra-ui/react";
 import Notification from "@components/Notification";
 import ToggleTheme from "@components/shared/ToggleTheme";
 import { useAuth } from "@contexts/AuthContext";
 import {
-    FiChevronDown,
-    FiCompass,
-    FiHome,
-    FiMenu,
-    FiSettings,
-    FiStar,
-    FiTrendingUp,
+	FiChevronDown,
+	FiCompass,
+	FiHome,
+	FiMenu,
+	FiSettings,
+	FiStar,
+	FiTrendingUp,
 } from "react-icons/fi";
 
 import NextLink from "next/link";
+import SearchBox from "@components/Search";
+import Footer from "@components/shared/Footer";
 
 const LinkItems = [
 	{ name: "Home", icon: FiHome },
@@ -66,8 +68,14 @@ export default function Layout({ children }) {
 				</DrawerContent>
 			</Drawer>
 			<MobileNav onOpen={onOpen} />
-			<Box ml={{ base: 0, md: 60 }} p="4">
-				{children}
+			<Box ml={{ base: 0, md: 60 }} p={4}>
+				<section>
+					<SearchBox />
+				</section>
+				<section>{children}</section>
+			</Box>
+			<Box as="section" ml={{ base: 0, md: 60 }}>
+				<Footer />
 			</Box>
 		</Box>
 	);
@@ -212,8 +220,7 @@ const MobileNav = ({ onOpen, ...rest }) => {
 									</Box>
 								</HStack>
 							</MenuButton>
-							<MenuList
-							>
+							<MenuList>
 								<MenuItem>Profile</MenuItem>
 								<MenuItem>Settings</MenuItem>
 								<MenuItem>Billing</MenuItem>

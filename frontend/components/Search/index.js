@@ -1,4 +1,18 @@
-import { Avatar, Flex, FormControl, Text } from "@chakra-ui/react";
+import { SearchIcon } from "@chakra-ui/icons";
+import {
+	Avatar,
+	FormControl,
+	Input,
+	InputGroup,
+	InputLeftElement,
+	Modal,
+	ModalContent,
+	ModalHeader,
+	ModalOverlay,
+	Text,
+	VStack,
+	useDisclosure,
+} from "@chakra-ui/react";
 import {
 	AutoComplete,
 	AutoCompleteInput,
@@ -9,7 +23,9 @@ import debounce from "lodash/debounce";
 import { useRouter } from "next/router";
 import { useRef, useState } from "react";
 
-function SearchBox() {
+const SearchModal = () => {
+	const { isOpen, onOpen, onClose } = useDisclosure();
+
 	const [list, setList] = useState();
 
 	const router = useRouter();
@@ -39,50 +55,94 @@ function SearchBox() {
 		return response.json();
 	};
 
-	console.log("List", list);
-
 	return (
-		<Flex
-			// pt="48"
-			justify="center"
-			align="center"
-			w="full"
-			direction="column"
-		>
-			<FormControl id="email" w="full">
-				<AutoComplete openOnFocus>
-					<AutoCompleteInput
-						// variant="filled"
-						placeholder="Search everything"
-						onChange={handleChange}
-						size="lg"
-						variant="unstyled"
-					/>
-					<AutoCompleteList w="full">
-						{list?.results.map((movie, oid) => (
-							<AutoCompleteItem
-								key={`${movie.id}-search-result`}
-								value={movie.title || movie.name}
-								textTransform="capitalize"
-								align="center"
-								onClick={() =>
-									router.push(`/movie/${movie.id}`)
-								}
-							>
-								<Avatar
-									size="lg"
-									rounded="none"
-									name={movie.name}
-									src={`https://image.tmdb.org/t/p/w200${movie.poster_path}`}
-								/>
-								<Text ml="4">{movie.title || movie.name}</Text>
-							</AutoCompleteItem>
-						))}
-					</AutoCompleteList>
-				</AutoComplete>
-			</FormControl>
-		</Flex>
-	);
-}
+		<>
+			<InputGroup>
+				<InputLeftElement pointerEvents="none">
+					<SearchIcon fontSize={"lg"} mt={2} />
+				</InputLeftElement>
 
-export default SearchBox;
+				<Input
+					onClick={onOpen}
+					placeholder="Search"
+					value={""}
+					size="lg"
+					readOnly
+				/>
+			</InputGroup>
+
+			<Modal isOpen={isOpen} onClose={onClose}>
+				<ModalOverlay />
+
+				<ModalContent>
+					<FormControl id="email" w="full">
+						<AutoComplete openOnFocus>
+							<ModalHeader>
+								<InputGroup>
+									<InputLeftElement pointerEvents="none">
+										<SearchIcon mb={3} mr={2} />
+									</InputLeftElement>
+
+									<AutoCompleteInput
+										placeholder="Search everything"
+										onChange={handleChange}
+										size="lg"
+										variant="unstyled"
+									/>
+								</InputGroup>
+							</ModalHeader>
+
+							<AutoCompleteList w="full" gap={2}>
+								{list?.results.map((movie, oid) => (
+									<AutoCompleteItem
+										key={`${movie.id}-search-result-${
+											movie.title || movie.name
+										}`}
+										value={movie.title || movie.name}
+										textTransform="capitalize"
+										justifyContent={"flex-start"}
+										align="left"
+										onClick={() => {
+											router
+												.push(`/movie/${movie.id}`)
+												.then(() => onClose());
+										}}
+									>
+										<Avatar
+											size="lg"
+											name={movie.name}
+											src={`https://image.tmdb.org/t/p/w200${movie.poster_path}`}
+											style={{
+												borderRadius: "0 !important",
+											}}
+										/>
+										<VStack
+											justifyContent={"flex-start"}
+											alignItems={"flex-start"}
+											w="full"
+										>
+											<Text
+												ml="4"
+												fontWeight={600}
+												fontSize={"xl"}
+											>
+												{movie.title || movie.name}
+											</Text>
+											<Text ml="8" alignSelf={"flex-end"}>
+												{new Date(
+													movie.release_date
+												).getFullYear()}
+											</Text>
+										</VStack>
+									</AutoCompleteItem>
+								))}
+							</AutoCompleteList>
+						</AutoComplete>
+					</FormControl>
+				</ModalContent>
+			</Modal>
+		</>
+	);
+};
+
+export default SearchModal;

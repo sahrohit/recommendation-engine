@@ -28,21 +28,19 @@ import {
 	FiCompass,
 	FiHome,
 	FiMenu,
-	FiSettings,
-	FiStar,
-	FiTrendingUp,
+	FiTrendingUp
 } from "react-icons/fi";
 
-import NextLink from "next/link";
-import SearchBox from "@components/Search";
+import SearchModal from "@components/Search";
 import Footer from "@components/shared/Footer";
+import NextLink from "next/link";
 
 const LinkItems = [
-	{ name: "Home", icon: FiHome },
-	{ name: "Trending", icon: FiTrendingUp },
-	{ name: "Explore", icon: FiCompass },
-	{ name: "Favourites", icon: FiStar },
-	{ name: "Settings", icon: FiSettings },
+	{ name: "Home", icon: FiHome, href: "/" },
+	{ name: "Trending", icon: FiTrendingUp, href: "/#trendings" },
+	{ name: "Discover", icon: FiCompass, href: "/#discover" },
+	// { name: "Favourites", icon: FiStar },
+	// { name: "Settings", icon: FiSettings },
 ];
 
 export default function Layout({ children }) {
@@ -69,10 +67,7 @@ export default function Layout({ children }) {
 			</Drawer>
 			<MobileNav onOpen={onOpen} />
 			<Box ml={{ base: 0, md: 60 }} p={4}>
-				<section>
-					<SearchBox />
-				</section>
-				<section>{children}</section>
+				{children}
 			</Box>
 			<Box as="section" ml={{ base: 0, md: 60 }}>
 				<Footer />
@@ -107,8 +102,11 @@ const SidebarContent = ({ onClose, ...rest }) => {
 					onClick={onClose}
 				/>
 			</Flex>
+			<Box mx={3} my={2}>
+				<SearchModal />
+			</Box>
 			{LinkItems.map((link) => (
-				<NavItem key={link.name} icon={link.icon}>
+				<NavItem key={link.name} icon={link.icon} href={link.href}>
 					{link.name}
 				</NavItem>
 			))}
@@ -116,11 +114,11 @@ const SidebarContent = ({ onClose, ...rest }) => {
 	);
 };
 
-const NavItem = ({ icon, children, ...rest }) => {
+const NavItem = ({ icon, children, href, ...rest }) => {
 	return (
 		<Link
 			as={NextLink}
-			href="#"
+			href={href}
 			style={{ textDecoration: "none" }}
 			_focus={{ boxShadow: "none" }}
 		>

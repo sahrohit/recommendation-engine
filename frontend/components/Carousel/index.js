@@ -7,9 +7,12 @@ import {
 	Stack,
 	Text,
 } from "@chakra-ui/react";
+import { useRouter } from "next/router";
 import { useState } from "react";
 
 const Carousel = ({ slides }) => {
+	const router = useRouter();
+
 	const arrowStyles = {
 		cursor: "pointer",
 		pos: "absolute",
@@ -102,6 +105,9 @@ const Carousel = ({ slides }) => {
 								color="white"
 								variant="solid"
 								colorScheme={"teal"}
+								onClick={() =>
+									router.push(`/movie/${slide.id}`)
+								}
 							>
 								Watch Now
 							</Button>

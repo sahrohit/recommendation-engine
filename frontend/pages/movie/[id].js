@@ -8,7 +8,7 @@ const MovieDetail = () => {
 	const { id } = router.query;
 
 	const { isLoading, isError, data, error } = useQuery(
-		"trendingMovies",
+		`movie-${id}`,
 		async () => {
 			const response = await fetch(
 				`https://api.themoviedb.org/3/movie/${id}?language=en-US&api_key=${process.env.NEXT_PUBLIC_TMDB_API_KEY}`,

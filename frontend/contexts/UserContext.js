@@ -1,11 +1,11 @@
-import React, { useContext, useEffect, useState } from "react";
-import { doc, updateDoc, onSnapshot, arrayUnion } from "firebase/firestore";
-import { db } from "../firebase";
-import FullPageLoadingSpinner from "@components/shared/FullPageLoadingSpinner";
-import { useAuth } from "./AuthContext";
-import { sum } from "lodash";
 import { useToast } from "@chakra-ui/react";
+import FullPageLoadingSpinner from "@components/shared/FullPageLoadingSpinner";
+import { arrayUnion, doc, onSnapshot, updateDoc } from "firebase/firestore";
+import { sum } from "lodash";
 import { nanoid } from "nanoid";
+import React, { useContext, useEffect, useState } from "react";
+import { db } from "../firebase";
+import { useAuth } from "./AuthContext";
 
 const UserContext = React.createContext();
 
@@ -197,3 +197,4 @@ const UserProvider = ({ children }) => {
 
 export { UserProvider };
 export { useUser };
+

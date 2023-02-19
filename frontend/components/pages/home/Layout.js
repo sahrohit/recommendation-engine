@@ -15,6 +15,7 @@ import {
 	MenuDivider,
 	MenuItem,
 	MenuList,
+	Spinner,
 	Text,
 	VStack,
 	useColorModeValue,
@@ -28,7 +29,7 @@ import {
 	FiCompass,
 	FiHome,
 	FiMenu,
-	FiTrendingUp
+	FiTrendingUp,
 } from "react-icons/fi";
 
 import SearchModal from "@components/Search";
@@ -152,7 +153,7 @@ const NavItem = ({ icon, children, href, ...rest }) => {
 };
 
 const MobileNav = ({ onOpen, ...rest }) => {
-	const { currentUser, logOut } = useAuth();
+	const { currentUser, logOut, loading } = useAuth();
 
 	return (
 		<Flex
@@ -183,7 +184,15 @@ const MobileNav = ({ onOpen, ...rest }) => {
 				Logo
 			</Text>
 
-			{currentUser ? (
+			{loading ? (
+				<Spinner
+					thickness="4px"
+					speed="0.65s"
+					emptyColor="gray.200"
+					color="green.500"
+					size="xl"
+				/>
+			) : currentUser ? (
 				<HStack spacing={{ base: "0", md: "6" }}>
 					<ToggleTheme />
 

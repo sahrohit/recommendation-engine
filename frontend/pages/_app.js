@@ -11,6 +11,7 @@ import Layout from "@components/pages/home/Layout";
 import Router from "next/router";
 import NProgress from "nprogress";
 import "nprogress/nprogress.css";
+import { MovieProvider } from "@contexts/MovieContext";
 
 Router.events.on("routeChangeStart", () => NProgress.start());
 Router.events.on("routeChangeComplete", () => NProgress.done());
@@ -24,27 +25,29 @@ function MyApp({ Component, pageProps }) {
 			<ChakraProvider theme={theme}>
 				<AuthProvider>
 					<UserProvider>
-						<Script
-							strategy="afterInteractive"
-							src={`https://www.googletagmanager.com/gtag/js?id=${gtag.GA_TRACKING_ID}`}
-						/>
-						<Script
-							id="gtag-init"
-							strategy="afterInteractive"
-							dangerouslySetInnerHTML={{
-								__html: `
-							window.dataLayer = window.dataLayer || [];
-							function gtag(){dataLayer.push(arguments);}
-							gtag('js', new Date());
-							gtag('config', '${gtag.GA_TRACKING_ID}', {
-								page_path: window.location.pathname,
-							});
-							`,
-							}}
-						/>
-						<Layout>
-							<Component {...pageProps} />
-						</Layout>
+						<MovieProvider>
+							<Script
+								strategy="afterInteractive"
+								src={`https://www.googletagmanager.com/gtag/js?id=${gtag.GA_TRACKING_ID}`}
+							/>
+							<Script
+								id="gtag-init"
+								strategy="afterInteractive"
+								dangerouslySetInnerHTML={{
+									__html: `
+								window.dataLayer = window.dataLayer || [];
+								function gtag(){dataLayer.push(arguments);}
+								gtag('js', new Date());
+								gtag('config', '${gtag.GA_TRACKING_ID}', {
+									page_path: window.location.pathname,
+								});
+								`,
+								}}
+							/>
+							<Layout>
+								<Component {...pageProps} />
+							</Layout>
+						</MovieProvider>
 					</UserProvider>
 				</AuthProvider>
 			</ChakraProvider>

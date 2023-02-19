@@ -3,20 +3,23 @@ import {
 	Center,
 	Flex,
 	HStack,
+	IconButton,
 	Img,
 	Link,
 	Text,
 	useColorModeValue,
 } from "@chakra-ui/react";
+import { useMovie } from "@contexts/MovieContext";
 import { AnimatePresence, motion } from "framer-motion";
 import { useRouter } from "next/router";
 import { useState } from "react";
 import { BsHeart, BsHeartFill } from "react-icons/bs";
 
 export default function MovieCard({ title, movie }) {
+	const { addToWatched, watched, removeFromWatched } = useMovie();
+
 	const router = useRouter();
 
-	const [liked, setLiked] = useState(false);
 	const [isHovered, setIsHovered] = useState(false);
 
 	const MotionBox = motion(Box);
@@ -36,9 +39,13 @@ export default function MovieCard({ title, movie }) {
 				)}
 				onMouseOver={() => setIsHovered(true)}
 				onMouseLeave={() => setIsHovered(false)}
-				onClick={() => router.push(`/movie/${movie.id}`)}
 			>
-				<Box h={"400px"} borderBottom={"1px"} borderColor="black">
+				<Box
+					h={"400px"}
+					borderBottom={"1px"}
+					borderColor="black"
+					onClick={() => router.push(`/movie/${movie.id}`)}
+				>
 					<Img
 						src={`https://image.tmdb.org/t/p/w400/${movie.poster_path}`}
 						roundedTop={"sm"}
@@ -46,9 +53,7 @@ export default function MovieCard({ title, movie }) {
 						h="full"
 						alt={"Blog Image"}
 					/>
-					<AnimatePresence
-						onExitComplete={() => conosle.log("Exited")}
-					>
+					<AnimatePresence>
 						{isHovered && (
 							<MotionBox
 								layout
@@ -117,18 +122,34 @@ export default function MovieCard({ title, movie }) {
 						</Link>
 					</Flex>
 					<Flex
-						p={4}
+						p={2}
 						alignItems="center"
 						justifyContent={"space-between"}
 						roundedBottom={"sm"}
 						borderLeft={"1px"}
 						cursor="pointer"
-						onClick={() => setLiked(!liked)}
+						onClick={() => addToWatched(movie)}
 					>
-						{liked ? (
-							<BsHeartFill fill="red" fontSize={"24px"} />
+						{watched
+							.map((movie) => movie.id.toString())
+							.includes(movie.id.toString()) ? (
+							<IconButton
+								variant="unstyled"
+								m={0}
+								onClick={async () =>
+									await removeFromWatched(movie.id.toString())
+								}
+							>
+								<BsHeartFill fill="red" fontSize={"24px"} />
+							</IconButton>
 						) : (
-							<BsHeart fontSize={"24px"} />
+							<IconButton
+								variant="unstyled"
+								m={0}
+								onClick={() => addToWatched(movie)}
+							>
+								<BsHeart fontSize={"24px"} />
+							</IconButton>
 						)}
 					</Flex>
 				</HStack>

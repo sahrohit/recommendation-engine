@@ -27,7 +27,7 @@ const styles = {
 	global: (props) => ({
 		body: {
 			color: mode("gray.800", "whiteAlpha.900")(props),
-			bg: mode("gray", "#121212")(props),
+			bg: mode("white", "#121212")(props),
 		},
 	}),
 };
@@ -36,7 +36,7 @@ const textVariants = {
 	// '#0D5074', '#B4ABF9'
 	emphasis: (props) => ({
 		// color: mode('#3F72AF', '#30E3CA')(props),
-		// color: mode('#0D5074', '#B4ABF9')(props),
+		// color: mode("#0D5074", "#B4ABF9")(props),
 		color: mode("#3F72AF", "#30E3CA")(props),
 	}),
 	description: (props) => ({

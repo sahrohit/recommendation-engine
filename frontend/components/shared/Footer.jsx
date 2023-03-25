@@ -34,7 +34,9 @@ const Footer = () => (
 				}}
 				align="start"
 			>
-				<Logo />
+				<Box>
+					<Logo />
+				</Box>
 				<Text color="muted">Keep track of what you are watching.</Text>
 			</Stack>
 			<Stack

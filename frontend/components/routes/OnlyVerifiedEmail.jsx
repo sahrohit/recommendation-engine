@@ -1,15 +1,16 @@
-import React, { useEffect } from "react";
-import { useAuth } from "@contexts/AuthContext";
-import { useRouter } from "next/router";
-import FullPageLoadingSpinner from "@components/shared/FullPageLoadingSpinner";
 import { useToast } from "@chakra-ui/react";
+import FullPageLoadingSpinner from "@components/shared/FullPageLoadingSpinner";
+import { useRouter } from "next/router";
+import { useEffect } from "react";
+import { useAuthState } from "react-firebase-hooks/auth";
+import { auth } from "../../firebase";
 
 const OnlyVerifiedEmail = ({ children }) => {
 	const toast = useToast();
 	const router = useRouter();
-	const { currentUser } = useAuth();
+	const [currentUser] = useAuthState(auth);
 
-	useEffect(() => {})
+	useEffect(() => {});
 
 	if (!currentUser) {
 		router.push("/");

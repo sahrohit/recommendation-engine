@@ -1,14 +1,17 @@
+import { CheckCircleIcon, CheckIcon, EmailIcon } from "@chakra-ui/icons";
 import { Box, Button, Center, Heading, HStack, Text } from "@chakra-ui/react";
-import { CheckCircleIcon } from "@chakra-ui/icons";
-import { EmailIcon, CheckIcon } from "@chakra-ui/icons";
-import { useState, useEffect } from "react";
-import { useAuth } from "@contexts/AuthContext";
+import { useEffect, useState } from "react";
 
-import { setToStorage, getFromStorage } from "@components/helpers/localstorage";
+import { getFromStorage, setToStorage } from "@components/helpers/localstorage";
 import { useRouter } from "next/router";
+import { useAuthState, useSendEmailVerification } from "react-firebase-hooks/auth";
+import { auth } from "../../firebase";
 
 const VerifyEmail = () => {
-	const { currentUser, sendVerificationEmail } = useAuth();
+	const [currentUser] = useAuthState(auth);
+
+	const [sendEmailVerification, sending, error] =
+		useSendEmailVerification(auth);
 
 	const router = useRouter();
 
@@ -65,7 +68,7 @@ const VerifyEmail = () => {
 								"resendVerificationTimeout",
 								Math.ceil(Date.now() / 1000) + 60
 							);
-							sendVerificationEmail(currentUser);
+							sendEmailVerification(currentUser);
 						}}
 					>
 						{Math.ceil(timeLeft) > 0

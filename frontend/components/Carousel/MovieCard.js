@@ -16,7 +16,8 @@ import { useState } from "react";
 import { BsHeart, BsHeartFill } from "react-icons/bs";
 
 export default function MovieCard({ title, movie }) {
-	const { addToWatched, watched, removeFromWatched } = useMovie();
+	const { addToWatched, removeFromWatched, watched, watchedList, loading } =
+		useMovie();
 
 	const router = useRouter();
 
@@ -128,16 +129,13 @@ export default function MovieCard({ title, movie }) {
 						roundedBottom={"sm"}
 						borderLeft={"1px"}
 						cursor="pointer"
-						onClick={() => addToWatched(movie)}
 					>
-						{watched
-							.map((movie) => movie.id.toString())
-							.includes(movie.id.toString()) ? (
+						{!loading && watchedList.includes(movie.id) ? (
 							<IconButton
 								variant="unstyled"
 								m={0}
-								onClick={async () =>
-									await removeFromWatched(movie.id.toString())
+								onClick={() =>
+									removeFromWatched(movie)
 								}
 							>
 								<BsHeartFill fill="red" fontSize={"24px"} />

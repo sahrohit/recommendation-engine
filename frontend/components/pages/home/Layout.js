@@ -3,6 +3,7 @@ import {
 	Box,
 	Button,
 	CloseButton,
+	Divider,
 	Drawer,
 	DrawerContent,
 	Flex,
@@ -15,15 +16,16 @@ import {
 	MenuDivider,
 	MenuItem,
 	MenuList,
+	Spacer,
 	Spinner,
+	Stack,
 	Text,
 	VStack,
-	useColorModeValue,
+	useColorModeValue as mode,
 	useDisclosure,
 } from "@chakra-ui/react";
 import Notification from "@components/Notification";
 import ToggleTheme from "@components/shared/ToggleTheme";
-import { useAuth } from "@contexts/AuthContext";
 import {
 	FiChevronDown,
 	FiCompass,
@@ -32,23 +34,32 @@ import {
 	FiTrendingUp,
 } from "react-icons/fi";
 
+import Logo from "@components/Logo";
 import SearchModal from "@components/Search";
 import Footer from "@components/shared/Footer";
 import NextLink from "next/link";
+import { useRouter } from "next/router";
+import { useAuthState, useSignOut } from "react-firebase-hooks/auth";
+import { MdManageAccounts } from "react-icons/md";
+import { RxDashboard } from "react-icons/rx";
+import { auth } from "../../../firebase";
 
 const LinkItems = [
 	{ name: "Home", icon: FiHome, href: "/" },
 	{ name: "Trending", icon: FiTrendingUp, href: "/#trendings" },
 	{ name: "Discover", icon: FiCompass, href: "/#discover" },
-	// { name: "Favourites", icon: FiStar },
-	// { name: "Settings", icon: FiSettings },
+];
+
+const LinkSettings = [
+	{ name: "Dashboard", icon: RxDashboard, href: "/dashboard" },
+	{ name: "Account", icon: MdManageAccounts, href: "/dashboard/account" },
 ];
 
 export default function Layout({ children }) {
 	const { isOpen, onOpen, onClose } = useDisclosure();
 
 	return (
-		<Box minH="100vh" bg={useColorModeValue("gray.100", "gray.900")}>
+		<Box minH="100vh" bg={mode("gray.100", "gray.900")}>
 			<SidebarContent
 				onClose={() => onClose}
 				display={{ base: "none", md: "block" }}
@@ -67,10 +78,10 @@ export default function Layout({ children }) {
 				</DrawerContent>
 			</Drawer>
 			<MobileNav onOpen={onOpen} />
-			<Box ml={{ base: 0, md: 60 }} p={4}>
+			<Box ml={{ base: 0, md: 80 }} p={4}>
 				{children}
 			</Box>
-			<Box as="section" ml={{ base: 0, md: 60 }}>
+			<Box as="section" ml={{ base: 0, md: 80 }}>
 				<Footer />
 			</Box>
 		</Box>
@@ -78,82 +89,110 @@ export default function Layout({ children }) {
 }
 
 const SidebarContent = ({ onClose, ...rest }) => {
+	const router = useRouter();
+	const [currentUser, loading] = useAuthState(auth);
+
 	return (
 		<Box
 			transition="3s ease"
-			bg={useColorModeValue("white", "gray.900")}
+			bg={mode("white", "gray.900")}
 			borderRight="1px"
-			borderRightColor={useColorModeValue("gray.200", "gray.700")}
-			w={{ base: "full", md: 60 }}
+			borderRightColor={mode("gray.200", "gray.700")}
 			pos="fixed"
-			h="full"
+			h="100vh"
 			{...rest}
 		>
 			<Flex
-				h="20"
-				alignItems="center"
-				mx="8"
-				justifyContent="space-between"
+				height="100vh"
+				direction="column"
+				borderRightWidth="1px"
+				px={6}
+				py={8}
 			>
-				<Text fontSize="2xl" fontFamily="monospace" fontWeight="bold">
-					Logo
-				</Text>
-				<CloseButton
-					display={{ base: "flex", md: "none" }}
-					onClick={onClose}
-				/>
+				<HStack mb={8} justifyContent={"space-between"}>
+					<Logo iconColor="blue.600" />
+					<CloseButton
+						display={{ base: "flex", md: "none" }}
+						onClick={onClose}
+					/>
+				</HStack>
+				<Box mb={6}>
+					<SearchModal />
+				</Box>
+				<Stack spacing={6}>
+					<Stack>
+						{LinkItems.map((link) => (
+							<NavLink
+								key={link.name}
+								label={link.name}
+								icon={link.icon}
+								href={link.href}
+								isActive={router.asPath === link.href}
+							/>
+						))}
+					</Stack>
+					<Divider />
+					<Stack>
+						{LinkSettings.map((link) => (
+							<NavLink
+								key={link.name}
+								label={link.name}
+								icon={link.icon}
+								href={link.href}
+								isActive={router.asPath === link.href}
+							/>
+						))}
+					</Stack>
+				</Stack>
+				<Spacer />
+				{!loading && currentUser && (
+					<UserProfile
+						name={currentUser.displayName}
+						image={currentUser.photoURL}
+						email={currentUser.email}
+					/>
+				)}
 			</Flex>
-			<Box mx={3} my={2}>
-				<SearchModal />
-			</Box>
-			{LinkItems.map((link) => (
-				<NavItem key={link.name} icon={link.icon} href={link.href}>
-					{link.name}
-				</NavItem>
-			))}
 		</Box>
 	);
 };
 
-const NavItem = ({ icon, children, href, ...rest }) => {
+const NavLink = (props) => {
+	const { icon, isActive, label, href, ...rest } = props;
 	return (
 		<Link
 			as={NextLink}
-			href={href}
-			style={{ textDecoration: "none" }}
-			_focus={{ boxShadow: "none" }}
+			href={href || "/"}
+			display="block"
+			py={2}
+			px={3}
+			borderRadius="md"
+			transition="all 0.3s"
+			fontWeight="medium"
+			lineHeight="1.5rem"
+			aria-current={isActive ? "page" : undefined}
+			color={mode("blackAlpha.800", "whiteAlpha.800")}
+			_hover={{
+				bg: mode("gray.100", "gray.700"),
+				color: mode("black", "white"),
+			}}
+			_activeLink={{
+				bg: mode("blue.500", "blue.300"),
+				color: mode("white", "black"),
+			}}
+			{...rest}
 		>
-			<Flex
-				align="center"
-				p="4"
-				mx="4"
-				borderRadius="lg"
-				role="group"
-				cursor="pointer"
-				_hover={{
-					bg: "cyan.400",
-					color: "white",
-				}}
-				{...rest}
-			>
-				{icon && (
-					<Icon
-						mr="4"
-						fontSize="16"
-						_groupHover={{
-							color: "white",
-						}}
-						as={icon}
-					/>
-				)}
-				{children}
-			</Flex>
+			<HStack spacing={4}>
+				<Icon as={icon} boxSize="20px" />
+				<Text as="span">{label}</Text>
+			</HStack>
 		</Link>
 	);
 };
 
 const MobileNav = ({ onOpen, ...rest }) => {
-	const { currentUser, logOut, loading } = useAuth();
+	const [currentUser, loading] = useAuthState(auth);
+	const [logOut] = useSignOut(auth);
 
 	return (
 		<Flex
@@ -161,9 +200,9 @@ const MobileNav = ({ onOpen, ...rest }) => {
 			px={{ base: 4, md: 4 }}
 			height="20"
 			alignItems="center"
-			bg={useColorModeValue("white", "gray.900")}
+			bg={mode("white", "gray.900")}
 			borderBottomWidth="1px"
-			borderBottomColor={useColorModeValue("gray.200", "gray.700")}
+			borderBottomColor={mode("gray.200", "gray.700")}
 			justifyContent={{ base: "space-between", md: "flex-end" }}
 			{...rest}
 		>
@@ -257,5 +296,20 @@ const MobileNav = ({ onOpen, ...rest }) => {
 				</HStack>
 			)}
 		</Flex>
+	);
+};
+
+const UserProfile = (props) => {
+	const { name, image, email } = props;
+	return (
+		<HStack spacing="4" px="2">
+			<Avatar name={name} src={image} />
+			<Flex direction="column">
+				<Text fontWeight="medium">{name}</Text>
+				<Text fontSize="xs" lineHeight="shorter">
+					{email}
+				</Text>
+			</Flex>
+		</HStack>
 	);
 };

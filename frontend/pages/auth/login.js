@@ -1,36 +1,37 @@
 import {
 	Button,
+	Center,
+	Image as ChakraImage,
+	Link as ChakraLink,
 	Checkbox,
+	Divider,
 	Flex,
 	FormControl,
+	FormErrorMessage,
 	FormLabel,
+	HStack,
 	Heading,
 	Input,
-	Link as ChakraLink,
 	Stack,
-	Image as ChakraImage,
-	useToast,
 	Text,
 	useBreakpointValue,
-	FormErrorMessage,
-	Divider,
-	Center,
-	VStack,
-	HStack,
-	IconButton,
-	Icon,
+	useToast,
 } from "@chakra-ui/react";
-import { useAuth } from "contexts/AuthContext";
-import { useRouter } from "next/router";
-import Link from "next/link";
-import { mobileBreakpointsMap } from "@config/theme";
-import { Formik, Form, Field } from "formik";
-import * as Yup from "yup";
 import OnlyLoggedOut from "@components/routes/OnlyLoggedOut";
-import { FcGoogle } from "react-icons/fc";
-import Image from "next/image";
-import { motion } from "framer-motion";
 import { fadeInRight } from "@config/animations";
+import { mobileBreakpointsMap } from "@config/theme";
+import { Field, Form, Formik } from "formik";
+import { motion } from "framer-motion";
+import Image from "next/image";
+import Link from "next/link";
+import { useRouter } from "next/router";
+import {
+	useSignInWithEmailAndPassword,
+	useSignInWithGoogle,
+} from "react-firebase-hooks/auth";
+import { FcGoogle } from "react-icons/fc";
+import * as Yup from "yup";
+import { auth } from "../../firebase";
 
 const LoginSchema = Yup.object().shape({
 	email: Yup.string()
@@ -42,7 +43,11 @@ const LoginSchema = Yup.object().shape({
 export default function LoginPage() {
 	const toast = useToast();
 	const router = useRouter();
-	const { logIn, signInWithGoogle } = useAuth();
+
+	const [signInWithGoogle] = useSignInWithGoogle(auth);
+	const [signInWithEmailAndPassword, user] =
+		useSignInWithEmailAndPassword(auth);
+
 	const isMobile = useBreakpointValue(mobileBreakpointsMap);
 	const MotionFlex = motion(Flex);
 
@@ -75,38 +80,40 @@ export default function LoginPage() {
 							whiteSpace={"nowrap"}
 							m={5}
 						>
-							Welcome back to Madre,
+							Welcome back to Movies,
 						</Heading>
 						<Formik
 							initialValues={{ email: "", password: "" }}
 							validationSchema={LoginSchema}
-							onSubmit={(values, actions) => {
-								logIn(values.email, values.password)
-									.then((userCredential) => {
-										const user = userCredential.user;
-										toast({
-											title: `Welcome back, ${user.displayName}!`,
-											description:
-												"We are happy to have you back.",
-											status: "success",
-											duration: 9000,
-											isClosable: true,
-										});
-										actions.setSubmitting(false);
-										// window.location.replace("/");
-										// router.push("/", "/");
-									})
-									.catch((error) => {
-										const errorMessage = error.message;
-										toast({
-											title: "Failed.",
-											description: errorMessage,
-											status: "error",
-											duration: 9000,
-											isClosable: true,
-										});
-										actions.setSubmitting(false);
+							onSubmit={async (values, actions) => {
+								const userCredential =
+									await signInWithEmailAndPassword(
+										values.email,
+										values.password
+									);
+
+								if (userCredential) {
+									const user = userCredential.user;
+									toast({
+										title: `Welcome back, ${user.displayName}!`,
+										description:
+											"We are happy to have you back.",
+										status: "success",
+										duration: 9000,
+										isClosable: true,
 									});
+									actions.setSubmitting(false);
+								} else {
+									const errorMessage = error.message;
+									toast({
+										title: "Failed.",
+										description: errorMessage,
+										status: "error",
+										duration: 9000,
+										isClosable: true,
+									});
+									actions.setSubmitting(false);
+								}
 							}}
 						>
 							{(props) => (
@@ -284,7 +291,7 @@ export default function LoginPage() {
 							objectFit={"cover"}
 							filter={`blur(1px) brightness(80%)`}
 							src={
-								"https://images.unsplash.com/photo-1498837167922-ddd27525d352?ixlib=rb-1.2.1&ixid=MnwxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8&auto=format&fit=crop&w=2070&q=80"
+								"https://images.unsplash.com/photo-1485846234645-a62644f84728?ixlib=rb-4.0.3&ixid=MnwxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8&auto=format&fit=crop&w=859&q=80"
 							}
 						/>
 					</Flex>

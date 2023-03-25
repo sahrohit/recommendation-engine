@@ -1,4 +1,6 @@
-import Detail from "@components/pages/movie/Detail";
+import { Box } from "@chakra-ui/react";
+import { MovieHeader } from "@components/pages/movie/MovieHeader";
+import Review from "@components/pages/movie/Review";
 import { useRouter } from "next/router";
 import { useQuery } from "react-query";
 
@@ -32,7 +34,22 @@ const MovieDetail = () => {
 		return <span>Error: {error.message}</span>;
 	}
 
-	return <Detail data={data} />;
+	return (
+		<Box mx={4}>
+			<MovieHeader data={data} />
+			<Box
+				mt="4"
+				fontSize={{
+					base: "lg",
+					lg: "xl",
+				}}
+				as="blockquote"
+			>
+				{data.overview}
+			</Box>
+			<Review id={data.id} />
+		</Box>
+	);
 };
 
 export default MovieDetail;

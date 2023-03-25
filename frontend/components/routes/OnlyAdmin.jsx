@@ -1,23 +1,18 @@
-import React, { useState, useEffect } from "react";
-import { useAuth } from "@contexts/AuthContext";
-import { useRouter } from "next/router";
-import FullPageLoadingSpinner from "@components/shared/FullPageLoadingSpinner";
 import { useToast } from "@chakra-ui/react";
+import FullPageLoadingSpinner from "@components/shared/FullPageLoadingSpinner";
 import {
-	collection,
-	addDoc,
 	doc,
-	setDoc,
-	updateDoc,
-	onSnapshot,
-	getDocs,
+	onSnapshot
 } from "firebase/firestore";
-import { db } from "../../firebase";
+import { useRouter } from "next/router";
+import { useEffect, useState } from "react";
+import { useAuthState } from "react-firebase-hooks/auth";
+import { auth, db } from "../../firebase";
 
 const OnlyAdmin = ({ children }) => {
 	const toast = useToast();
 	const router = useRouter();
-	const { currentUser } = useAuth();
+	const [currentUser] = useAuthState(auth);
 	const [admin, setAdmin] = useState();
 	const [loading, setLoading] = useState(true);
 

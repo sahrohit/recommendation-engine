@@ -1,16 +1,15 @@
 import {
-	collection,
+	collectionGroup,
 	deleteDoc,
 	doc,
-	onSnapshot,
-	orderBy,
-	query,
 	serverTimestamp,
 	setDoc,
+	where,
 } from "firebase/firestore";
-import React, { useContext, useEffect, useState } from "react";
-import { db } from "../firebase";
-import { useAuth } from "./AuthContext";
+import React, { useContext } from "react";
+import { useAuthState } from "react-firebase-hooks/auth";
+import { useCollectionData } from "react-firebase-hooks/firestore";
+import { auth, db } from "../firebase";
 
 const MovieContext = React.createContext();
 
@@ -19,56 +18,38 @@ const useMovie = () => {
 };
 
 const MovieProvider = ({ children }) => {
-	const [watched, setWatched] = useState([]);
-	const [loading, setLoading] = useState(true);
-
-	const {
-		currentUser: { uid },
-	} = useAuth();
-
-	useEffect(
-		() =>
-			onSnapshot(
-				query(
-					collection(db, "users", uid, "watched"),
-					orderBy("timestamp", "desc")
-				),
-				(snapshot) => {
-					setWatched(
-						snapshot.docs.map((doc) => {
-							return doc.data();
-						})
-					);
-					setLoading(false);
-				}
-			),
-		[uid]
+	const [currentUser] = useAuthState(auth);
+	const [watched, loading] = useCollectionData(
+		collectionGroup(db, "watched"),
+		where("user", "==", currentUser?.uid),
+		{
+			snapshotListenOptions: { includeMetadataChanges: true },
+		}
 	);
 
 	const addToWatched = async (movie) => {
-		await setDoc(doc(db, "users", uid, "watched", movie.id.toString()), {
-			...movie,
-			timestamp: serverTimestamp(),
-		});
+		await setDoc(
+			doc(db, "users", currentUser?.uid, "watched", movie.id.toString()),
+			{
+				...movie,
+				user: currentUser?.uid,
+				timestamp: serverTimestamp(),
+			}
+		);
 	};
 
-	const removeFromWatched = async (movieId) => {
-		console.log(
-			"Being Deleted",
-			"users",
-			uid,
-			"watched",
-			movieId.toString()
+	const removeFromWatched = async (movie) => {
+		await deleteDoc(
+			doc(db, "users", currentUser?.uid, "watched", movie.id.toString())
 		);
-
-		await deleteDoc(doc(db, "users", uid, "watched", movieId.toString()));
 	};
 
 	const value = {
-		watched,
-		loading,
 		addToWatched,
 		removeFromWatched,
+		watched,
+		watchedList: watched?.map((movie) => movie.id),
+		loading,
 	};
 
 	return (
@@ -76,8 +57,7 @@ const MovieProvider = ({ children }) => {
 	);
 };
 
-export { MovieProvider as MovieProvider };
-export { useMovie as useMovie };
+export { MovieProvider as MovieProvider, useMovie as useMovie };
 
 const MovieContextWrapper = ({ children }) => {
 	return <MovieProvider>{children}</MovieProvider>;

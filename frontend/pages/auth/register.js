@@ -1,48 +1,38 @@
 import {
+	Box,
 	Button,
+	Image as ChakraImage,
+	Link as ChakraLink,
 	Flex,
 	FormControl,
+	FormErrorMessage,
 	FormLabel,
+	HStack,
 	Heading,
 	Input,
-	Link as ChakraLink,
 	Stack,
-	Image as ChakraImage,
-	Box,
-	HStack,
 	Text,
-	FormErrorMessage,
 	useBreakpointValue,
 	useToast,
-	Center,
-	VStack,
 } from "@chakra-ui/react";
-import Link from "next/link";
-import { mobileBreakpointsMap } from "@config/theme";
-import { Formik, Form, Field } from "formik";
-import { useAuth } from "@contexts/AuthContext";
-import { useRouter } from "next/router";
-import * as Yup from "yup";
-import { setToStorage } from "@components/helpers/localstorage";
 import OnlyLoggedOut from "@components/routes/OnlyLoggedOut";
-import {
-	collection,
-	addDoc,
-	doc,
-	setDoc,
-	updateDoc,
-	onSnapshot,
-	getDocs,
-	deleteField,
-} from "firebase/firestore";
-import { db } from "../../firebase";
-import Image from "next/image";
-import { AnimatePresence, motion } from "framer-motion";
 import { fadeInLeft } from "@config/animations";
+import { Field, Form, Formik } from "formik";
+import { AnimatePresence, motion } from "framer-motion";
+import Image from "next/image";
+import Link from "next/link";
+import {
+	useAuthState,
+	useCreateUserWithEmailAndPassword,
+	useSendEmailVerification,
+	useUpdateProfile,
+} from "react-firebase-hooks/auth";
+import * as Yup from "yup";
+import { auth } from "../../firebase";
+import { doc, setDoc } from "firebase/firestore";
 
 const RegisterPage = () => {
 	const toast = useToast();
-	const router = useRouter();
 	const SignupSchema = Yup.object().shape({
 		firstname: Yup.string().required(),
 		lastname: Yup.string(),
@@ -54,7 +44,12 @@ const RegisterPage = () => {
 			.max(25, "Too Long!")
 			.required("Password is required"),
 	});
-	const { signUp, updateProfileDetails, sendVerificationEmail } = useAuth();
+	const [user] = useAuthState(auth);
+	const [createUserWithEmailAndPassword] =
+		useCreateUserWithEmailAndPassword(auth);
+	const [updateProfile] = useUpdateProfile(auth);
+	const [sendEmailVerification] = useSendEmailVerification(auth);
+
 	const isMobile = useBreakpointValue({
 		base: true,
 		md: true,
@@ -98,7 +93,7 @@ const RegisterPage = () => {
 							objectFit={"cover"}
 							filter={`blur(1px) brightness(70%)`}
 							src={
-								"https://images.unsplash.com/photo-1504754524776-8f4f37790ca0?ixlib=rb-1.2.1&ixid=MnwxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8&auto=format&fit=crop&w=1352&q=80"
+								"https://images.unsplash.com/photo-1485846234645-a62644f84728?ixlib=rb-4.0.3&ixid=MnwxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8&auto=format&fit=crop&w=859&q=80"
 							}
 						/>
 					</Flex>
@@ -130,7 +125,7 @@ const RegisterPage = () => {
 								whiteSpace={"nowrap"}
 								m={5}
 							>
-								Sign up to Madre
+								Sign up to Movies
 							</Heading>
 
 							<Formik
@@ -142,24 +137,20 @@ const RegisterPage = () => {
 								}}
 								validationSchema={SignupSchema}
 								onSubmit={async (values, actions) => {
-									signUp(values.email, values.password)
-										.then((userCredential) => {
-											const user = userCredential.user;
-											updateProfileDetails(
-												user,
-												`${values.firstname} ${values.lastname}`
-											);
-											setDoc(
-												doc(db, "users", user.uid),
-												{}
-											);
-											actions.setSubmitting(false);
-											setToStorage(
-												"resendVerificationTimeout",
-												Math.ceil(Date.now() / 1000) +
-													60
-											);
-
+									await createUserWithEmailAndPassword(
+										values.email,
+										values.password
+									);
+									const success = await updateProfile({
+										displayName: `${values.firstname} ${values.lastname}`,
+									});
+									await setDoc(doc(db, "users", user.uid), {
+										...user,
+									});
+									if (success) {
+										const sent =
+											await sendEmailVerification();
+										if (sent) {
 											toast({
 												title: `Welcome ${values.firstname} ${values.lastname}!`,
 												description:
@@ -168,26 +159,17 @@ const RegisterPage = () => {
 												duration: 9000,
 												isClosable: true,
 											});
-											sendVerificationEmail(user).then(
-												() => {
-													// router.push(
-													// 	"/auth/verifyemail",
-													// 	"/auth/verifyemail"
-													// );
-												}
-											);
-										})
-										.catch((error) => {
-											const errorMessage = error.message;
-											toast({
-												title: "Failed.",
-												description: errorMessage,
-												status: "error",
-												duration: 9000,
-												isClosable: true,
-											});
-											actions.setSubmitting(false);
+										}
+									} else {
+										toast({
+											title: "Failed.",
+											description: "Something went wrong",
+											status: "error",
+											duration: 9000,
+											isClosable: true,
 										});
+									}
+									actions.setSubmitting(false);
 								}}
 							>
 								{(props) => (

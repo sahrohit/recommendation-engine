@@ -18,10 +18,11 @@ const useMovie = () => {
 };
 
 const MovieProvider = ({ children }) => {
-	const [currentUser] = useAuthState(auth);
+	const [currentUser, userloading] = useAuthState(auth);
+
 	const [watched, loading] = useCollectionData(
 		collectionGroup(db, "watched"),
-		where("user", "==", currentUser?.uid),
+		where("user", "==", currentUser?.uid || "-"),
 		{
 			snapshotListenOptions: { includeMetadataChanges: true },
 		}
@@ -51,6 +52,8 @@ const MovieProvider = ({ children }) => {
 		watchedList: watched?.map((movie) => movie.id),
 		loading,
 	};
+
+	if (userloading) return <div>Loading...</div>;
 
 	return (
 		<MovieContext.Provider value={value}>{children}</MovieContext.Provider>

@@ -1,25 +1,21 @@
 import {
 	Button,
-	FormControl,
+	Link as ChakraLink,
 	Flex,
+	FormControl,
+	FormErrorMessage,
+	FormLabel,
 	Heading,
 	Input,
 	Stack,
 	Text,
-	useColorModeValue,
-	useToast,
-	Link as ChakraLink,
-	FormErrorMessage,
-	FormLabel,
+	useColorModeValue
 } from "@chakra-ui/react";
-import { useAuth } from "contexts/AuthContext";
+import { Field, Form, Formik } from "formik";
 import Link from "next/link";
-import { Formik, Form, Field } from "formik";
 import * as Yup from "yup";
 
 const ForgotPassword = () => {
-	const toast = useToast();
-	const { resetPassword } = useAuth();
 	const ForgotPasswordSchema = Yup.object().shape({
 		email: Yup.string()
 			.email("Invalid Email Address")
@@ -42,28 +38,7 @@ const ForgotPassword = () => {
 					initialValues={{ email: "" }}
 					validationSchema={ForgotPasswordSchema}
 					onSubmit={(values, actions) => {
-						resetPassword(values.email)
-							.then(() => {
-								toast({
-									title: "Email Sent Successfully.",
-									description:
-										"Check your inbox for the reset link.",
-									status: "success",
-									duration: 9000,
-									isClosable: true,
-								});
-								actions.setSubmitting(false);
-							})
-							.catch((error) => {
-								toast({
-									title: "An Error Occured.",
-									description: error.message,
-									status: "error",
-									duration: 9000,
-									isClosable: true,
-								});
-								actions.setSubmitting(false);
-							});
+						console.log(values);
 					}}
 				>
 					{(props) => (

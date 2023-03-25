@@ -2,7 +2,6 @@ import { Button } from "@chakra-ui/react";
 import React from "react";
 import { db } from "../firebase";
 import { deleteDoc, doc } from "firebase/firestore";
-import { useAuth } from "@contexts/AuthContext";
 
 const TestingPage = () => {
 	const {

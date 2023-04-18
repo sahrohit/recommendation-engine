@@ -40,7 +40,7 @@ import Footer from "@components/shared/Footer";
 import NextLink from "next/link";
 import { useRouter } from "next/router";
 import { useAuthState, useSignOut } from "react-firebase-hooks/auth";
-import { MdManageAccounts } from "react-icons/md";
+import { MdManageAccounts, MdRecommend } from "react-icons/md";
 import { RxDashboard } from "react-icons/rx";
 import { auth } from "../../../firebase";
 
@@ -143,6 +143,14 @@ const SidebarContent = ({ onClose, ...rest }) => {
 							/>
 						))}
 					</Stack>
+					<Divider />
+					<NavLink
+						key="Recommend"
+						label="Recommend"
+						icon={MdRecommend}
+						href="/recommend"
+						isActive={router.asPath === "/recommend"}
+					/>
 				</Stack>
 				<Spacer />
 				{!loading && currentUser && (

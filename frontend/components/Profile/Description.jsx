@@ -20,7 +20,7 @@ export const Description = (props) => {
 				color={mode("gray.500", "white")}
 				mt="1"
 			>
-				{labels.map((label) => (
+				{labels?.map((label) => (
 					<Badge key={`${title} ${label}`}>{label}</Badge>
 				))}
 			</HStack>

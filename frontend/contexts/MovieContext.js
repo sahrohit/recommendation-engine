@@ -1,7 +1,9 @@
+import FullPageLoadingSpinner from "@components/shared/FullPageLoadingSpinner";
 import {
 	collectionGroup,
 	deleteDoc,
 	doc,
+	query,
 	serverTimestamp,
 	setDoc,
 	where,
@@ -21,8 +23,8 @@ const MovieProvider = ({ children }) => {
 	const [currentUser, userloading] = useAuthState(auth);
 
 	const [watched, loading] = useCollectionData(
-		collectionGroup(db, "watched"),
-		where("user", "==", currentUser?.uid || "-"),
+		query(collectionGroup(db, "watched"),
+		where("user", "==", currentUser?.uid || "-")),
 		{
 			snapshotListenOptions: { includeMetadataChanges: true },
 		}
@@ -53,7 +55,7 @@ const MovieProvider = ({ children }) => {
 		loading,
 	};
 
-	if (userloading) return <div>Loading...</div>;
+	if (userloading) return <FullPageLoadingSpinner />;
 
 	return (
 		<MovieContext.Provider value={value}>{children}</MovieContext.Provider>

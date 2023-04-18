@@ -85,7 +85,10 @@ const Dashboard = () => {
 											}
 											movie={movie}
 										>
-											{movie.overview.substring(0, 130)}
+											{movie?.overview?.substring(
+												0,
+												130
+											) ?? "No overview"}
 											...
 										</Description>
 									</HStack>

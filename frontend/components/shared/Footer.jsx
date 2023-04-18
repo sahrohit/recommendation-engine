@@ -10,10 +10,10 @@ import {
 	useColorModeValue,
 } from "@chakra-ui/react";
 import Logo from "@components/Logo";
-import { FaGithub, FaLinkedin, FaTwitter } from "react-icons/fa";
+import { FaGithub } from "react-icons/fa";
 
 const Footer = () => (
-	<Box bg={useColorModeValue("white", "gray.900")} px={4}>
+	<Box bg={useColorModeValue("white", "gray.900")} px={16}>
 		<Stack
 			spacing="8"
 			direction={{

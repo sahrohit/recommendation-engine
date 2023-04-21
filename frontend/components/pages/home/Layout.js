@@ -59,7 +59,10 @@ export default function Layout({ children }) {
 	const { isOpen, onOpen, onClose } = useDisclosure();
 
 	return (
-		<Box minH="100vh" bg={mode("gray.100", "gray.900")}>
+		<Box
+			minH="100vh"
+			// bg={mode("gray.100", "gray.900")}
+		>
 			<SidebarContent
 				onClose={() => onClose}
 				display={{ base: "none", md: "block" }}
@@ -81,9 +84,9 @@ export default function Layout({ children }) {
 			<Box ml={{ base: 0, md: 80 }} p={4}>
 				{children}
 			</Box>
-			<Box as="section" ml={{ base: 0, md: 80 }}>
+			{/* <Box as="section" ml={{ base: 0, md: 80 }}>
 				<Footer />
-			</Box>
+			</Box> */}
 		</Box>
 	);
 }

@@ -1,27 +1,30 @@
 import { SearchIcon } from "@chakra-ui/icons";
 import {
-    Avatar,
-    Box,
-    Button,
-    FormControl,
-    FormLabel,
-    InputGroup,
-    InputLeftElement,
-    Text,
-    VStack,
+	Avatar,
+	Box,
+	Button,
+	FormControl,
+	FormLabel,
+	HStack,
+	InputGroup,
+	InputLeftElement,
+	Text,
+	VStack,
 } from "@chakra-ui/react";
 import {
-    AutoComplete,
-    AutoCompleteInput,
-    AutoCompleteItem,
-    AutoCompleteList,
-    AutoCompleteTag,
+	AutoComplete,
+	AutoCompleteInput,
+	AutoCompleteItem,
+	AutoCompleteList,
+	AutoCompleteTag,
 } from "@choc-ui/chakra-autocomplete";
+import { Description } from "@components/Profile/Description";
 import debounce from "lodash/debounce";
 import { useRef, useState } from "react";
 
 const RecommendPage = () => {
 	const [list, setList] = useState();
+	const [recommendations, setRecommendations] = useState();
 
 	const debouncedSearch = useRef(
 		debounce(async (criteria) => {
@@ -48,6 +51,20 @@ const RecommendPage = () => {
 		return response.json();
 	};
 
+	const recommend = async (movies) => {
+		const response = await fetch(
+			`https://api.themoviedb.org/3/movie/${movies[0].id}/recommendations?api_key=${process.env.NEXT_PUBLIC_TMDB_API_KEY}&language=en-US&page=1`,
+			{
+				method: "GET",
+				redirect: "follow",
+			}
+		);
+		if (!response.ok) {
+			throw new Error("Network response was not ok");
+		}
+		return response.json();
+	};
+
 	return (
 		<Box
 			w="full"
@@ -58,6 +75,8 @@ const RecommendPage = () => {
 		>
 			<form>
 				<FormControl
+					as={VStack}
+					gap={4}
 					w="full"
 					maxW={{ base: "full", md: "md", lg: "lg", xl: "xl" }}
 				>
@@ -132,10 +151,48 @@ const RecommendPage = () => {
 						</AutoCompleteList>
 					</AutoComplete>
 					<Box textAlign={"center"} m={4}>
-						<Button type="submit">Recommend</Button>
+						<Button
+							type="button"
+							onClick={async () => {
+								const movies = await recommend(list.results);
+								console.log(movies);
+								setRecommendations(movies);
+							}}
+						>
+							Recommend
+						</Button>
 					</Box>
 				</FormControl>
 			</form>
+			<VStack gap={4}>
+				{recommendations &&
+					recommendations.results.map((movie) => (
+						<HStack key={movie.id}>
+							<Avatar
+								size="2xl"
+								src={`https://image.tmdb.org/t/p/w400/${movie.poster_path}`}
+								borderRadius={"none"}
+							/>
+							<Description
+								title={movie.title || movie.name}
+								labels={movie.genre_ids}
+								removeFromWatched={() => {
+									toast({
+										title: "What are you trying to do?",
+										description: `Stop clicking every button you see`,
+										status: "info",
+										duration: 5000,
+									});
+								}}
+								movie={movie}
+							>
+								{movie?.overview?.substring(0, 130) ??
+									"No overview"}
+								...
+							</Description>
+						</HStack>
+					))}
+			</VStack>
 		</Box>
 	);
 };

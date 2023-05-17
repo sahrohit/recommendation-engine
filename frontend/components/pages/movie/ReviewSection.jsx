@@ -61,25 +61,6 @@ export const ReviewSection = ({ data }) => (
 						What other people think about this movie, and what they
 						think about the actors. All their opinions are here.
 					</Text>
-					<HStack
-						mt="8"
-						as="a"
-						display="inline-flex"
-						href="#"
-						className="group"
-						fontSize="lg"
-						fontWeight="bold"
-						color={useColorModeValue("blue.600", "blue.300")}
-					>
-						<span>Join the team</span>
-						<Box
-							as={FaArrowRight}
-							transition="all 0.2s"
-							_groupHover={{
-								transform: "translateX(5px)",
-							}}
-						/>
-					</HStack>
 				</Box>
 				<SimpleGrid
 					mt={{

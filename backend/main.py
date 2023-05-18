@@ -28,10 +28,7 @@ def api():
     input_json = request.json
     device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
 
-    with open("intents.json", "r") as f:
-        intents = json.load(f)
-
-    FILE = "data.pth"
+    FILE = "model.pth"
     data = torch.load(FILE)
 
     movies = data["movies"]

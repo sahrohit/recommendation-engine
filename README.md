@@ -1,4 +1,4 @@
-# Movie Recommendation App
+<center><h1>Movie Recommendation App</h1></center>
 
 This is a Movie Recommendation App built using Python Flask as the backend and Next.js with Chakra UI as the frontend.
 
